@@ -113,44 +113,34 @@
                     </v-btn>
                 </v-row>                                        
                 </v-col>
-            </v-row>                
-
-                <v-container class="grey lighten-5">
+            </v-row>           
+            <v-container class="grey lighten-5">
                 <v-row no-gutters>
-                <template v-for="n in filasrecibo">
-                    <v-col 
-                    :key="n"
-                    :cols="(n%4) === 2 ? 6 : undefined"                   
-                    >
-                    <v-card
-                        class="pa-2"
-                        outlined
-                        tile
-                        style="text-align: center;"
-                    >
-                    {{ n === 1 ? 'Cant.' :  ''}}
-                    {{ n === 2 ? 'Articulo' :  ''}}
-                    {{ n === 3 ? 'Código' :  ''}}
-                    {{ n === 4 ? 'Precio' :  ''}}
-                    <v-text-field
-                        v-if="n > 4 && recibo.indexEditado > -1"                                                    
-                        dense
-                        hide-details
-                        disabled
-                    ></v-text-field>
-                    <v-text-field
-                        v-if="n > 4 && recibo.indexEditado === -1"                                                    
-                        dense
-                        hide-details                                                 
-                    ></v-text-field>
-                    </v-card>
+                    <v-col v-for="(el, key) in descriptionTest" :key="`header-${key}`" :cols="key === 'article' ? 6 : undefined">
+                        <v-card
+                            class="pa-2"
+                            outlined
+                            tile
+                            style="text-align: center;">
+                            {{ el.label }}
+                        </v-card>
                     </v-col>
                     <v-responsive
-                    v-if="n%4 === 0"
-                    :key="`width-${n}`"
                     width="100%"
                     ></v-responsive>
-                </template>
+                    <v-col v-for="(el, key) in descriptionTest" :key="key" :cols="key === 'article' ? 6 : undefined">
+                        <v-card
+                            class="pa-2"
+                            outlined
+                            tile
+                            style="text-align: center;">
+                            <v-text-field
+                                v-model="el.value"                  
+                                dense
+                                hide-details
+                            ></v-text-field>
+                        </v-card>
+                    </v-col>
                 </v-row>
             </v-container>
 
@@ -276,6 +266,24 @@ import { mapState, mapMutations } from 'vuex'
 
 export default {        
     data: () => ({
+      descriptionTest: {
+          quantity: {
+            label: 'Cant.',
+            value: null
+          },
+          article: {
+            label: 'Artículo',
+            value: null
+          },
+          code: {
+            label: 'Código.',
+            value: null
+          },
+          price: {
+            label: 'Precio',
+            value: null
+          },
+      },
       numero: 6,
       filasrecibo: 8,
       defaultItem: {
