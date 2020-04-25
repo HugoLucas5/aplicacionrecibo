@@ -3,12 +3,13 @@
     :headers="headers"
     :items="desserts"
     :search="search"
-    sort-by="nombre_cliente"
+    sort-by="fecha"
+    sort-desc
     class="elevation-1"
   >
     <template v-slot:top>
       <v-toolbar flat color="gray">
-        <v-toolbar-title>RECIBOS</v-toolbar-title>
+        <v-toolbar-title>RECIBOS, VENTA A: {{ cliente }}</v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
@@ -22,16 +23,13 @@
         hide-details
         clearable
         ></v-text-field>
-        <v-spacer></v-spacer>
-        <v-dialog v-model="dialog" max-width="1000px">
-          <template v-slot:activator="{ on }">
-            <v-btn color="blue" dark class="mb-2" v-on="on" @click="flag">Nuevo</v-btn>
-          </template> 
+        <v-spacer></v-spacer>    
+          <v-dialog v-model="dialog" max-width="1000px">         
 
           <Recibo> </Recibo>
          <!--  :titulo="formTitle" :item="editedItem" :index="editedIndex" -->
 
-        </v-dialog>
+        </v-dialog>   
       </v-toolbar>
     </template>
     <template v-slot:item.action="{ item }">
@@ -42,6 +40,7 @@
       >
         mdi-eye
       </v-icon>
+      
       <v-icon
         small
         @click="deleteItem(item)"
@@ -61,41 +60,27 @@ export default {
   },
 
   data: () => ({
-    filasrecibo: 8,
     search: '',
     headers: [
-      {
-        text: 'Nombre del Cliente',
-        align: 'left',
-        value: 'nombre_cliente',
-      },
-      { text: 'Teléfono', value: 'telefono_cliente' },
-      { text: 'Saldo', value: 'saldo' },
-      { text: 'Fecha de Entrega', value: 'fecha_entrega' },
+      {text: 'No.',value: 'id', sortable: false},
+      {text: 'Fecha', value: 'fecha', sortable: false},
+      {text: 'Abono', value: 'abono', sortable: false},
+      {text: 'Saldo', value: 'saldo_actual', sortable: false},      
       { text: 'Acciones', value: 'action', sortable: false },
-    ],
-    //desserts: [],
-    editedIndex: -1,
-    editedItem: {
-      nombre_cliente: '',
-      telefono_cliente: '',
-      saldo: 0,
-      fecha_entrega: '',
-    },
-    defaultItem: {
-      nombre_cliente: '',
-      telefono_cliente: '',
-      saldo: 0,
-      fecha_entrega: '',
-    },
+    ],    
+    copiaVenta: {},    
   }),
 
   computed: {
     ...mapState(['recibo']),
     ...mapState(['recibos']),
+    
 
-    formTitle () {
-      return this.recibo.indexEditado === -1 ? 'Nuevo Recibo' : 'Ver Recibo'
+    cliente:{
+      get(){
+        const cli = this.copiaVenta.cliente.nombre + ' ' +this.copiaVenta.cliente.apellido
+        return cli
+      }
     },
     dialog: {
       get(){
@@ -125,53 +110,125 @@ export default {
 
   methods: {    
      initialize () {
-        var item = [{
-            nombre_cliente: 'hugo',
-            telefono_cliente: '41966767',
-            saldo: 6.0,
-            fecha_entrega: '24/08/2020',
-            numero: '500',
-            fecha: '15/15/2020',
-          },
-          {
-            nombre_cliente: 'juan',
-            telefono_cliente: '77672118',
-            saldo: 6.0,
-            fecha_entrega: '12/12/2020',
-            numero: '200',
-            fecha: '15/15/2020',
-          }]; 
+        var item = [          
+              {
+                id: 1,
+                fecha: "2020-04-10",
+                abono: "200.00",
+                saldo_actual: "400.00",
+                habilitado: true,
+                fecha_entrega: "2020-04-30",
+                pagos: [
+                  {
+                    tipo_pago: {
+                      id: 1,
+                      nombre: "Efectivo"
+                    },
+                    cantidad: "66.66"
+                  },
+                  {
+                    tipo_pago: {
+                      id: 2,
+                      nombre: "Cheque"
+                    },
+                    cantidad: "66.66"
+                  },
+                  {
+                    tipo_pago: {
+                      id: 3,
+                      nombre: "VisaCuotas"
+                    },
+                    cantidad: "66.67"
+                  }
+                ],
+                recibo_siguiente: 2
+              },
+              {
+                id: 2,
+                fecha: "2020-04-10",
+                abono: "150.00",
+                saldo_actual: "250.00",
+                habilitado: true,
+                pagos: [
+                  {
+                    tipo_pago: {
+                      id: 1,
+                      nombre: "Efectivo"
+                    },
+                    cantidad: "50.00"
+                  },
+                  {
+                    tipo_pago: {
+                      id: 2,
+                      nombre: "Cheque"
+                    },
+                    cantidad: "50.00"
+                  },
+                  {
+                    tipo_pago: {
+                      id: 3,
+                      nombre: "VisaCuotas"
+                    },
+                    cantidad: "50.00"
+                  }
+                ],
+                recibo_siguiente: 3
+              },
+              {
+                id: 3,
+                fecha: "2020-04-10",
+                abono: "250.00",
+                saldo_actual: "0.00",
+                habilitado: true,
+                pagos: [
+                  {
+                    tipo_pago: {
+                      id: 1,
+                      nombre: "Efectivo"
+                    },
+                    cantidad: "83.33"
+                  },
+                  {
+                    tipo_pago: {
+                      id: 2,
+                      nombre: "Cheque"
+                    },
+                    cantidad: "83.33"
+                  },
+                  {
+                    tipo_pago: {
+                      id: 3,
+                      nombre: "VisaCuotas"
+                    },
+                    cantidad: "83.34"
+                  }
+                ],
+                recibo_siguiente: null
+              }
+            ]; 
        //this.$store.dispatch('recibos/obtenerRecibos')
        this.$store.commit('recibos/createDessert', item)
+       this.copiaVenta = {...this.recibo.itemEditado}
+       this.$store.commit('recibo/assignItem', {})
+       console.log('copia venta: ',this.copiaVenta)
+       console.log('item editado',this.recibo.itemEditado)
       return this.recibos.desserts
       /*//-----> AQUI DEBERIA IR UNA ACCION
       QUE VA A HACER LA LLAMADA A LA API PARA
-      OBTENER LOS RECIBOS
-
-       /* this.desserts = [
-        {
-          nombre_cliente: 'Frozen Yogurt',
-          telefono_cliente: 159,
-          saldo: 6.0,
-          fecha_entrega: 24,
-        },
-        {
-          nombre_cliente: 'Ice cream sandwich',
-          telefono_cliente: 237,
-          saldo: 9.0,
-          fecha_entrega: 37,
-        },          
-      ]  */
+      OBTENER LOS RECIBOS */
+       
     }, 
 
     editItem (item) {      
       var indice = this.desserts.indexOf(item)
       console.log(indice)
       this.$store.commit('recibo/assignIndex', indice )
-      var itemasignar = item
-      console.log('ITEM DESDE RECIBOS '+itemasignar)      
+      var objrecibosaux = item
+      this.copiaVenta.recibo = item
+      var itemasignar = Object.assign({}, {...this.copiaVenta})      
+      console.log('ITEM DESDE RECIBOS, itemasignar ',itemasignar)      
       this.$store.commit('recibo/assignItem', { itemasignar })
-      var titulo = this.formTitle
+      var titulo = "Ver Recibo"
       this.$store.commit('recibo/assignTitle', titulo)
       this.$store.commit('recibos/editDialog', true)
     },
@@ -183,14 +240,14 @@ export default {
 
     close () {          
     this.$store.commit('recibos/editDialog', false)
-    var item = this.defaultItem
+    console.log('cierrte desde recibos')
     
     setTimeout(() => {
-        var itemasignar = Object.assign({}, item)
-        this.$store.commit('recibo/assignItem', { itemasignar })
+        var itemasignar = {}
+        this.$store.commit('recibo/assignItem', {itemasignar})
         var indice = -1
         this.$store.commit('recibo/assignIndex', indice )
-        var titulo = this.formTitle
+        var titulo = "Ver Recibo"
         this.$store.commit('recibo/assignTitle', titulo)
       }, 300)//cuando cierre, setear datosTemporales de recibo, a defaultItem
     },

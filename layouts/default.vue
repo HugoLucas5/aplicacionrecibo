@@ -83,8 +83,8 @@ export default {
         
         {
           icon: 'mdi-receipt',
-          title: 'Recibos',
-          to: '/recibos'
+          title: 'Ventas',
+          to: '/ventas'
         },
       ],
       miniVariant: true,
